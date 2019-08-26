@@ -139,3 +139,27 @@ Update the rules tree of a version of a property. The rules tree must be fed by 
 ```
 $ cat rules.json | papi update-property-version-rules <property-id> <version-no> <contract-id> <group-id>
 ```
+
+List all past and current activations of a property.
+
+```
+$ papi list-property-activations <property-id> <contract-id> <group-id>
+```
+
+Activate a version of a property. The network parameter can be `STAGING` or `PRODUCTION`.
+
+```
+$ papi create-property-activation <property-id> <contract-id> <group-id> <version-no> <network> <notify-email>
+```
+
+Get the details of an activation order.
+
+```
+$ papi get-property-activation <property-id> <activation-id> <contract-id> <group-id>
+```
+
+Cancel an ongoing activation.
+
+```
+$ papi cancel-property-activation <property-id> <activation-id> <contract-id> <group-id>
+```
