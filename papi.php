@@ -78,6 +78,7 @@ $credentials = array_shift($argv);
 $section = array_shift($argv);
 $cname = array_shift($argv);
 if (empty($cname)) {
+  
 ?>
 Usage: php <?= __FILE__ ?> <command> [<args> ...]
 Available commands:
@@ -104,6 +105,12 @@ Available commands:
   get-property-activation <property-id> <activation-id> <contract-id> <group-id>
   cancel-property-activation <property-id> <activation-id> <contract-id> <group-id>
 <?php
+
+} else if ($cname === 'alias') {
+
+  $name = array_shift($argv);
+  printf("alias %s='%s %s %s %s'\n", $name, $_SERVER['_'], __FILE__, realpath($credentials), $section);
+
 } else if ($cdef = $commands[$cname]) {
 
   $method = $cdef['method'];

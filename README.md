@@ -20,10 +20,18 @@ client_secret = "WW91IHdpbGwgbmV2ZXIga25vdyB3aGF0IGl0IGlzCg=="
 ^D
 ```
 
-Every call to this CLI is a call to PHP with this script as first argument, and the credentials file and section as second and third arguments, all of which could be in a different location from that where you have all your configurations. I suggest you create an alias and use the alias as the actual command.
+Every call to this CLI is a call to PHP with this script as first argument and the credentials file and section as second and third arguments, all of which could be in a different location from that where you have all your configurations.
+
+I suggest you create an alias and use the alias as the actual command, for which you can use the `alias` command, which makes all paths absolute and returns an `alias` command line ready to be fed into the shell.
 
 ```
-$ alias papi="/usr/bin/php ~/akamai-cli/papi.php ~/akamai-cli/credentials.ini default"
+$ eval $(php papi.php <credentials> <section> alias <alias-name>)
+```
+
+This is an example of a particular resulting alias. Notice that all paths are absolute and so the alias can be invoked from any location for the rest of the session.
+
+```
+$ alias papi='/Applications/XAMPP/bin/php /Users/me/Development/akamai-cli/papi.php /Users/me/Development/akamai-configs/credentials.ini default'
 ```
 
 ## Usage
