@@ -11,13 +11,19 @@ All the API responses are JSON objects and are pretty-printed to stdout. You can
 Get API credentials and save them in a file.
 
 ```
-$ cat >api.ini
+$ cat >credentials.ini
 [default]
 client_token = "akab-1234567890ajze42-5mqabcdeffclu554"
 host = "akab-bau2wa3c5iabcdef-x7h1234567890744.luna.akamaiapis.net"
 access_token = "akab-abcdefpbzh3yxocw-wns1234567890tp3"
 client_secret = "WW91IHdpbGwgbmV2ZXIga25vdyB3aGF0IGl0IGlzCg=="
 ^D
+```
+
+Every call to this CLI is a call to PHP with this script as first argument, and the credentials file and section as second and third arguments, all of which could be in a different location from that where you have all your configurations. I suggest you create an alias and use the alias as the actual command.
+
+```
+$ alias papi="/usr/bin/php ~/akamai-cli/papi.php ~/akamai-cli/credentials.ini default"
 ```
 
 ## Usage
@@ -27,107 +33,101 @@ client_secret = "WW91IHdpbGwgbmV2ZXIga25vdyB3aGF0IGl0IGlzCg=="
 List all the groups that are visible to your API client.
 
 ```
-$ php papi.php api.ini default list-groups
+$ papi list-groups
 ```
 
 List all the contracts that are visible to your API client.
 
 ```
-$ php papi.php api.ini default list-contracts
+$ papi list-contracts
 ```
 
 List all the products in a contract.
 
 ```
-$ php papi.php api.ini default list-products <contract-id>
+$ papi list-products <contract-id>
 ```
 
 List all the CP codes for a contract and a group.
 
 ```
-$ php papi.php api.ini default list-cpcodes <contract-id> <group-id>
+$ papi list-cpcodes <contract-id> <group-id>
 ```
 
 Create a CP code.
 
 ```
-$ php papi.php api.ini default create-cpcode <contract-id> <group-id> <product-id> <cpcode-name>
+$ papi create-cpcode <contract-id> <group-id> <product-id> <cpcode-name>
 ```
 
 Get the details of a CP code.
 
 ```
-$ php papi.php api.ini default get-cpcode <cpcode-id> <contract-id> <group-id>
+$ papi get-cpcode <cpcode-id> <contract-id> <group-id>
 ```
 
 List the edge hostnames for a contract and a group.
 
 ```
-$ php papi.php api.ini default list-edge-hostnames <contract-id> <group-id>
-```
-
-Create an edge hostname.
-
-```
-TO BE IMPLEMENTED
+$ papi list-edge-hostnames <contract-id> <group-id>
 ```
 
 List the properties for a contract and a group.
 
 ```
-$ php papi.php api.ini default list-properties <contract-id> <group-id>
+$ papi list-properties <contract-id> <group-id>
 ```
 
 Create a property.
 
 ```
-$ php papi.php api.ini default create-property <contract-id> <group-id> <product-id> <property-name>
+$ papi create-property <contract-id> <group-id> <product-id> <property-name>
 ```
 
 Get the details of a property.
 
 ```
-$ php papi.php api.ini default get-property <property-id> <contract-id> <group-id>
+$ papi get-property <property-id> <contract-id> <group-id>
 ```
 
 List all the versions of a property.
 
 ```
-$ php papi.php api.ini default list-property-versions <property-id> <contract-id> <group-id>
+$ papi list-property-versions <property-id> <contract-id> <group-id>
 ```
 
 Create a new version of a property.
 
 ```
-$ php papi.php api.ini default create-property-version <property-id> <contract-id> <group-id> <from-version>
+$ papi create-property-version <property-id> <contract-id> <group-id> <from-version>
 ```
 
 Get the details of a version of a property.
 
 ```
-$ php papi.php api.ini default get-property-version <property-id> <version-no> <contract-id> <group-id>
+$ papi get-property-version <property-id> <version-no> <contract-id> <group-id>
 ```
 
 Get the hostnames of a version of a property.
 
 ```
-$ php papi.php api.ini default get-property-version-hostnames <property-id> <version-no> <contract-id> <group-id>
+$ papi get-property-version-hostnames <property-id> <version-no> <contract-id> <group-id>
 ```
 
-Update the hostnames of a version of a property.
+Update the hostnames of a version of a property. The hostnames must be fed by stdin in JSON format.
 
 ```
-TO BE IMPLEMENTED
+$ cat hostnames.json | papi update-property-version-rules <property-id> <version-no> <contract-id> <group-id>
 ```
 
 Get the rules tree of a version of a property.
 
 ```
-$ php papi.php api.ini default get-property-version-rules <property-id> <version-no> <contract-id> <group-id>
+$ papi get-property-version-rules <property-id> <version-no> <contract-id> <group-id>
 ```
 
-Update the rules tree of a version of a property.
+Update the rules tree of a version of a property. The rules tree must be fed by stdin in JSON format.
 
 ```
-TO BE IMPLEMENTED
+$ cat rules.json | papi update-property-version-rules <property-id> <version-no> <contract-id> <group-id>
 ```

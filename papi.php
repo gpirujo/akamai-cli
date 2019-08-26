@@ -30,6 +30,10 @@ function put($url, $count = 0) {
   return method('put', $url, $count);
 }
 
+function delete($url, $count = 0) {
+  return method('delete', $url, $count);
+}
+
 $commands = [
   'list-groups' => get('groups'),
   'list-contracts' => get('contracts'),
@@ -49,53 +53,58 @@ $commands = [
     'propertyName' => '%s',
   ]), 2),
   'get-property' => get('properties/%s?contractId=%s&groupId=%s', 3),
-  # delete-property
   'list-property-versions' => get('properties/%s/versions?contractId=%s&groupId=%s', 3),
   'create-property-version' => post('properties/%s/versions?contractId=%s&groupId=%s', 3, json_encode([
     'createFromVersion' => '%s',
   ]), 1),
   'get-property-version' => get('properties/%s/versions/%s?contractId=%s&groupId=%s', 4),
   'get-property-version-hostnames' => get('properties/%s/versions/%s/hostnames?contractId=%s&groupId=%s', 4),
-  # update property version hostnames
+  'update-property-version-hostnames' => put('properties/%s/versions/%s/hostnames?contractId=%s&groupId=%s', 4),
   'get-property-version-rules' => get('properties/%s/versions/%s/rules?contractId=%s&groupId=%s', 4),
   'update-property-version-rules' => put('properties/%s/versions/%s/rules?contractId=%s&groupId=%s', 4),
-  # list activations
-  # create activation
-  # get activation
-  # cancel activation
+  'list-property-activations' => get('properties/%s/activations?contractId=%s&groupId=%s', 3),
+  'create-property-activation' => post('properties/%s/activations?contractId=%s&groupId=%s', 3, json_encode([
+    'propertyVersion' => '%s',
+    'network' => '%s',
+    'notifyEmails' => ['%s'],
+#    'acknowledgeWarnings' => ["msg_7a2aa72bca3f894607c126436861cb73fb82d677", "msg_1d2ecd69b22ce52028f55561bff01fd64c76f8d5", "msg_e94d764742a56988686c1e630cbe66c30eb52bf5", "msg_7b80aa702b7140f1f3b1f4d98c1a9ae48f11fd54"]
+  ]), 3),
+  'get-property-activation' => get('properties/%s/activations/%s?contractId=%s&groupId=%s', 4),
+  'cancel-property-activation' => delete('properties/%s/activations/%s?contractId=%s&groupId=%s', 4),
 ];
 
 array_shift($argv); // myself
-if (empty($argv)) {
-  ?>
-  Usage: php <?= __FILE__ ?> <command> [<args> ...]
-  Available commands:
-    list-groups
-    list-contracts
-    list-products <contract-id>
-    list-cpcodes <contract-id> <group-id>
-    create-cpcode <contract-id> <group-id> <product-id> <cpcode-name>
-    get-cpcode <cpcode-id> <contract-id> <group-id>
-    list-edge-hostnames <contract-id> <group-id>
-  <?php #create-etls-ehn <contract-id> <group-id> <product-id> <enrollment-id> <name-without-edgekey.net> <IPV4|IPV6|IPV6_COMPLIANCE> ?>
-    list-properties <contract-id> <group-id>
-    create-property <contract-id> <group-id> <product-id> <property-name>
-    get-property <property-id> <contract-id> <group-id>
-    list-property-versions <property-id> <contract-id> <group-id>
-    create-property-version <property-id> <contract-id> <group-id> <from-version>
-    get-property-version <property-id> <version-no> <contract-id> <group-id>
-    get-property-version-hostnames <property-id> <version-no> <contract-id> <group-id>
-    get-property-version-rules <property-id> <version-no> <contract-id> <group-id>
-    <rules> | update-property-version-rules <property-id> <version-no> <contract-id> <group-id>
-  <?php
-    exit();
-}
-
 $credentials = array_shift($argv);
 $section = array_shift($argv);
 $cname = array_shift($argv);
-
-if ($cdef = $commands[$cname]) {
+if (empty($cname)) {
+?>
+Usage: php <?= __FILE__ ?> <command> [<args> ...]
+Available commands:
+  list-groups
+  list-contracts
+  list-products <contract-id>
+  list-cpcodes <contract-id> <group-id>
+  create-cpcode <contract-id> <group-id> <product-id> <cpcode-name>
+  get-cpcode <cpcode-id> <contract-id> <group-id>
+  list-edge-hostnames <contract-id> <group-id>
+<?php #create-etls-ehn <contract-id> <group-id> <product-id> <enrollment-id> <name-without-edgekey.net> <IPV4|IPV6|IPV6_COMPLIANCE> ?>
+  list-properties <contract-id> <group-id>
+  create-property <contract-id> <group-id> <product-id> <property-name>
+  get-property <property-id> <contract-id> <group-id>
+  list-property-versions <property-id> <contract-id> <group-id>
+  create-property-version <property-id> <contract-id> <group-id> <from-version>
+  get-property-version <property-id> <version-no> <contract-id> <group-id>
+  get-property-version-hostnames <property-id> <version-no> <contract-id> <group-id>
+  <hostnames> | update-property-version-hostnames <property-id> <version-no> <contract-id> <group-id>
+  get-property-version-rules <property-id> <version-no> <contract-id> <group-id>
+  <rules> | update-property-version-rules <property-id> <version-no> <contract-id> <group-id>
+  list-property-activations <property-id> <contract-id> <group-id>
+  create-property-activation <property-id> <contract-id> <group-id> <version-no> <network> <email>
+  get-property-activation <property-id> <activation-id> <contract-id> <group-id>
+  cancel-property-activation <property-id> <activation-id> <contract-id> <group-id>
+<?php
+} else if ($cdef = $commands[$cname]) {
 
   $method = $cdef['method'];
 
