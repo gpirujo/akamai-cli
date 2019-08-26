@@ -9,6 +9,10 @@ class Command {
     return new static('get', $url, $urlArgs);
   }
 
+  public function post($url, $urlArgs = []) {
+    return new static('post', $url, $urlArgs);
+  }
+
   protected function __construct($method, $url, $urlArgs) {
     $this->method = strtoupper($method);
     $this->url = $url;
@@ -46,13 +50,14 @@ class Command {
 
 class CommandLineInterface {
 
-  protected $prefix = '', $commands = [];
+  protected $file, $prefix = '', $commands = [];
 
-  public static function create($prefix, $commands = []) {
-    return new static($prefix, $commands);
+  public static function create($file, $prefix, $commands = []) {
+    return new static($file, $prefix, $commands);
   }
 
-  protected function __construct($prefix, $commands) {
+  protected function __construct($file, $prefix, $commands) {
+    $this->file = $file;
     $this->prefix = $prefix;
     foreach ($commands as $name => $command) $this->commands[$name] = $command->export($prefix);
   }
@@ -95,7 +100,7 @@ class CommandLineInterface {
       $this->usage();
     } else if ($cname === 'alias') {
       $name = array_shift($argv);
-      printf("alias %s='%s %s %s %s'\n", $name, $_SERVER['_'], __FILE__, realpath($credentials), $section);
+      printf("alias %s='%s %s %s %s'\n", $name, $_SERVER['_'], $this->file, realpath($credentials), $section);
     } else {
       $this->execute($credentials, $section, $cname, $argv);
     }

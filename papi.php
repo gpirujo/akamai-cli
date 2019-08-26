@@ -2,7 +2,7 @@
 
 require 'akamai.php';
 
-CommandLineInterface::create('/papi/v1')
+CommandLineInterface::create(__FILE__, '/papi/v1')
 ->get(
   'list-groups',
    'groups'
