@@ -13,6 +13,10 @@ class Command {
     return new static('post', $url, $urlArgs);
   }
 
+  public function put($url, $urlArgs = []) {
+    return new static('put', $url, $urlArgs);
+  }
+
   protected function __construct($method, $url, $urlArgs) {
     $this->method = strtoupper($method);
     $this->url = $url;
