@@ -5,19 +5,7 @@ require 'akamai-open-edgegrid-auth-1.0.1.phar';
 class Command {
   protected $method, $url, $urlArgs, $body = '', $bodyArgs = [], $stdin, $headers = [];
 
-  public function get($url, $urlArgs = []) {
-    return new static('get', $url, $urlArgs);
-  }
-
-  public function post($url, $urlArgs = []) {
-    return new static('post', $url, $urlArgs);
-  }
-
-  public function put($url, $urlArgs = []) {
-    return new static('put', $url, $urlArgs);
-  }
-
-  protected function __construct($method, $url, $urlArgs) {
+  public function __construct($method, $url, $urlArgs) {
     $this->method = strtoupper($method);
     $this->url = $url;
     $this->urlArgs = $urlArgs;
@@ -31,6 +19,16 @@ class Command {
 
   public function headers($headers) {
     $this->headers = $headers;
+    return $this;
+  }
+
+  public function contentType($type) {
+    $this->headers[] = sprintf('Content-Type: %s', $type);
+    return $this;
+  }
+
+  public function accept($type) {
+    $this->headers[] = sprintf('Accept: %s', $type);
     return $this;
   }
 
@@ -64,35 +62,6 @@ class CommandLineInterface {
     $this->file = $file;
     $this->prefix = $prefix;
     foreach ($commands as $name => $command) $this->commands[$name] = $command->export($prefix);
-  }
-
-  protected function method($name, $method, $url, $urlArgs = [], $body = '', $bodyArgs = [], $stdin = '') {
-    $method = strtoupper($method);
-    $this->commands[$name] = [
-      'method' => $method,
-      'url' => sprintf('%s/%s', $this->prefix, $url),
-      'urlArgs' => $urlArgs,
-      'body' => $body,
-      'bodyArgs' => $bodyArgs,
-      'stdin' => $stdin,
-    ];
-    return $this;
-  }
-
-  public function get($name, $url, $args = []) {
-    return $this->method($name, 'get', $url, $args);
-  }
-
-  public function post($name, $url, $urlArgs = [], $body, $bodyArgs = []) {
-    return $this->method($name, 'post', $url, $urlArgs, $body, $bodyArgs);
-  }
-
-  public function put($name, $url, $urlArgs, $stdin) {
-    return $this->method($name, 'put', $url, $urlArgs, '', [], $stdin);
-  }
-
-  public function delete($name, $url, $urlArgs = []) {
-    return $this->method($name, 'delete', $url, $urlArgs);
   }
 
   public function run($argv) {
@@ -201,4 +170,29 @@ class CommandLineInterface {
     }
   }
 
+}
+
+function get($url, $urlArgs = []) {
+  return new Command('get', $url, $urlArgs);
+}
+
+function post($url, $urlArgs = [], $stdin = null) {
+  $post = new Command('post', $url, $urlArgs);
+  if (isset($stdin)) $post->stdin($stdin);
+  return $post;
+}
+
+function put($url, $urlArgs = [], $stdin = null) {
+  $put = new Command('put', $url, $urlArgs);
+  if (isset($stdin)) $put->stdin($stdin);
+  return $put;
+}
+
+function delete($url, $urlArgs = []) {
+  return new Command('delete', $url, $urlArgs);
+}
+
+function cli($file, $prefix, $commands) {
+  global $argv;
+  CommandLineInterface::create($file, $prefix, $commands)->run($argv);
 }
